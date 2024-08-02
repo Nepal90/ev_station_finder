@@ -1,7 +1,7 @@
 import 'package:ev_station_finder/components/Button.dart';
 import 'package:ev_station_finder/components/DefField.dart';
+import 'package:ev_station_finder/services/admin_firestore_service.dart';
 import 'package:flutter/material.dart';
-
 class AddStationPage extends StatefulWidget {
   const AddStationPage({super.key});
 
@@ -11,15 +11,10 @@ class AddStationPage extends StatefulWidget {
 
 class _AddStationPageState extends State<AddStationPage> {
   final _formKey = GlobalKey<FormState>();
-
   final _nameController = TextEditingController();
   final _locationController = TextEditingController();
   final _cityController = TextEditingController();
-
-  // String? _stationName;
-  // String? _locationName;
-  // String? _cityName;
-
+  final FirestoreServices _firestoreService = FirestoreServices();
   bool _isStationEnabled = true;
 
   @override
@@ -78,9 +73,8 @@ class _AddStationPageState extends State<AddStationPage> {
                 },
               ),
               const SizedBox(height: 20.0),
-
               Padding(
-                padding: const EdgeInsets.fromLTRB(10,8,8,8),
+                padding: const EdgeInsets.fromLTRB(10, 8, 8, 8),
                 child: Row(
                   children: [
                     Text('Station Enabled:'),
@@ -99,16 +93,23 @@ class _AddStationPageState extends State<AddStationPage> {
               Center(
                 child: Button(
                   buttonText: "Add Station",
-                  buttonFunction: () {
+                  buttonFunction: () async {
                     if (_formKey.currentState!.validate()) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Station added successfully'),
-                        ),
+                      await _firestoreService.addStation(
+                        _nameController.text,
+                        _locationController.text,
+                        _cityController.text,
+                        _isStationEnabled,
                       );
-                      // Add station logic here, including the _isStationEnabled state
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Station added successfully')),
+                      );
+                      _nameController.clear();
+                      _locationController.clear();
+                      _cityController.clear();
                     }
-                  }, onTap: () {  },
+                  },
+                  onTap: () {},
                 ),
               ),
             ],

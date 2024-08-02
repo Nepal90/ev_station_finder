@@ -1,7 +1,9 @@
-import 'package:ev_station_finder/components/DefField.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:ev_station_finder/services/admin_firestore_service.dart';
 import 'package:ev_station_finder/models/station.dart';
 import 'package:ev_station_finder/widgets/station_card.dart';
+import 'package:ev_station_finder/components/DefField.dart';
 
 class StationListScreen extends StatefulWidget {
   @override
@@ -10,41 +12,8 @@ class StationListScreen extends StatefulWidget {
 
 class _StationListScreenState extends State<StationListScreen> {
   final _nameController = TextEditingController();
-  final List<Station> allStations = [
-    Station(
-      name: 'charge_station 1',
-      address: 'niharika, Korba, Chhattisgarh',
-      imageUrl: 'https://media.istockphoto.com/id/1393199281/photo/charging-stations-for-electric-cars-at-a-parking-lot.jpg?s=612x612&w=0&k=20&c=wJicZeR-yfR1I3MHWxQ0ZZUV2nUMhovwq-zVGJrYZPI=',
-      city: 'Korba',
-      nearby: true,
-      status: 'Enabled',
-    ),
-    Station(
-      name: 'charge_station 2',
-      address: 'koshabadi, Korba, Chhattisgarh',
-      imageUrl: 'https://media.istockphoto.com/id/1348631007/photo/ev-charging-station-for-electric-car-in-concept-of-green-energy-and-eco-power.jpg?s=612x612&w=0&k=20&c=yTL95mCTPWTNqEO4NqiWWSeC_JMINNUJeChE9a6YKVc=',
-      city: 'korba',
-      nearby: true,
-      status: 'Enabled',
-    ),
-    Station(
-      name: 'charge_station 3',
-      address: 'Transport nagar, Korba, Chhattisgarh',
-      imageUrl: 'https://media.istockphoto.com/id/1292252309/photo/electric-cars-are-charging-in-station.jpg?s=612x612&w=0&k=20&c=i2hMAmP83hPn-NKTm7iIE6JVh3mFvIpChHxPD3dtg4M=',
-      city: 'korba',
-      nearby: true,
-      status: 'Enabled',
-    ),
-    Station(
-      name: 'charge_station 4',
-      address: 'dipka, korba, Chhattisgarh',
-      imageUrl: 'https://media.istockphoto.com/id/1073405402/photo/power-supply-box-in-an-electric-vehicle-charging-station-at-a-parking-lot.jpg?s=612x612&w=0&k=20&c=oMPdqM67RNpTDZpZ-EhaqyUkiNy15C8Dl9JaaJ5GW5c=',
-      city: 'korba',
-      nearby: false,
-      status: 'Enabled',
-    ),
-  ];
-
+  final FirestoreServices _firestoreService = FirestoreServices();
+  List<Station> allStations = [];
   List<Station> filteredStations = [];
   String searchCity = '';
   bool searchNearby = false;
@@ -53,7 +22,16 @@ class _StationListScreenState extends State<StationListScreen> {
   @override
   void initState() {
     super.initState();
-    filteredStations = allStations;
+    _fetchStations();
+  }
+
+  void _fetchStations() async {
+    _firestoreService.getStations().listen((stations) {
+      setState(() {
+        allStations = stations.cast<Station>();
+        filteredStations = allStations;
+      });
+    });
   }
 
   void filterStations() {
@@ -99,8 +77,10 @@ class _StationListScreenState extends State<StationListScreen> {
                       Checkbox(
                         value: searchNearby,
                         onChanged: (value) {
-                          searchNearby = value!;
-                          filterStations();
+                          setState(() {
+                            searchNearby = value!;
+                            filterStations();
+                          });
                         },
                       ),
                       const Text('Nearby'),
@@ -116,8 +96,10 @@ class _StationListScreenState extends State<StationListScreen> {
                       );
                     }).toList(),
                     onChanged: (value) {
-                      searchStatus = value!;
-                      filterStations();
+                      setState(() {
+                        searchStatus = value!;
+                        filterStations();
+                      });
                     },
                   ),
                 ],
