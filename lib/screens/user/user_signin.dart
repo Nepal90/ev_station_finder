@@ -2,8 +2,10 @@ import 'package:ev_station_finder/components/Button.dart';
 import 'package:ev_station_finder/components/DefField.dart';
 import 'package:ev_station_finder/screens/user/forget_password.dart';
 import 'package:ev_station_finder/screens/user/user_dashboard.dart';
+import 'package:ev_station_finder/screens/admin/admin_dashboard.dart'; // Import admin dashboard screen
 import 'package:ev_station_finder/screens/user/user_signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -23,14 +25,28 @@ class _signInState extends State<signIn> {
   Future<void> _signIn() async {
     if (_formKey.currentState!.validate()) {
       try {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
+        UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => DashboardScreen()),
-        );
+
+        User? user = userCredential.user;
+        if (user != null) {
+          DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+          String role = userDoc['role'];
+
+          if (role == 'admin') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => AdminDashboard()),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => DashboardScreen()),
+            );
+          }
+        }
       } on FirebaseAuthException catch (e) {
         String message;
         if (e.code == 'user-not-found') {
@@ -61,7 +77,6 @@ class _signInState extends State<signIn> {
                     SizedBox(
                       height: 18,
                     ),
-                    //-------------------Page Heading-------------------------------------
                     Text(
                       "Welcome to ",
                       textAlign: TextAlign.center,
@@ -97,7 +112,6 @@ class _signInState extends State<signIn> {
                 SizedBox(
                   height: 30,
                 ),
-                //------------------------------------ Page Image------------------------------------
                 Image(
                   image: AssetImage("assets/icons/logo.png"),
                   height: 180,
@@ -115,7 +129,6 @@ class _signInState extends State<signIn> {
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         child: Column(
                           children: [
-                            //--------------------------------Email Field--------------------------------------------
                             DefField(
                               controller: _emailController,
                               hint: "Enter your email",
@@ -136,7 +149,6 @@ class _signInState extends State<signIn> {
                             SizedBox(
                               height: 18,
                             ),
-                            //----------------------------- Password field-------------------------------------------
                             DefField(
                               controller: _passwordController,
                               hint: "Enter your password",
@@ -158,7 +170,6 @@ class _signInState extends State<signIn> {
                                 return null;
                               },
                             ),
-                            //-------------------------------------------Forget password button-------------------------------------
                             GestureDetector(
                               onTap: () => Navigator.push(
                                 context,
@@ -185,8 +196,6 @@ class _signInState extends State<signIn> {
                       SizedBox(
                         height: 5,
                       ),
-
-                      //----------------------- Login button-----------------------
                       Button(
                         buttonText: "Sign In",
                         buttonFunction: _signIn,
@@ -195,7 +204,6 @@ class _signInState extends State<signIn> {
                     ],
                   ),
                 ),
-                //-------------------------- Register screen Navigation---------------------------------------
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -231,11 +239,9 @@ class _signInState extends State<signIn> {
                     ),
                   ],
                 ),
-                //External providers Icon
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    //Google sign-in Icon
                     IconButton(
                       color: Colors.grey,
                       onPressed: () {},

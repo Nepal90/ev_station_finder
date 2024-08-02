@@ -48,7 +48,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           'email': _emailController.text.trim(),
           'mobileNumber': _PhoneNumberController.text.trim(),
           'password': _passwordController.text.trim(),
-          'role': _roleController.text.trim()
+          'role': "user",
           // Add more fields as needed
         });
 
@@ -61,7 +61,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         );
 
         // Navigate to the SignIn screen after showing the success message
-        Future.delayed(const Duration(microseconds: 300), () {
+        Future.delayed(const Duration(microseconds: 50), () {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const signIn()),
