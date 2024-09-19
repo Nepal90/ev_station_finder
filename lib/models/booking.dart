@@ -1,10 +1,16 @@
 class Booking {
   final String stationName;
   final DateTime dateTime;
-  final String status;
+  final String userFirstName;
+  final String userLastName;
+  final String userEmail;
+  
 
   Booking({
     required this.stationName,
     required this.dateTime,
-    required this.status});
+    required this.userFirstName,
+    required this.userLastName,
+    required this.userEmail,
+  });
 }

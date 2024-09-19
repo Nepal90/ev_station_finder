@@ -1,8 +1,3 @@
-//import 'dart:nativewrappers/_internal/vm/lib/internal_patch.dart';
-
-//import 'package:ev_station_finder/models/user.dart';
-import 'package:ev_station_finder/main.dart';
-import 'package:ev_station_finder/provider/UserProvider.dart';
 import 'package:ev_station_finder/screens/user/find_stations.dart';
 import 'package:ev_station_finder/screens/user/manage_vehicles.dart';
 import 'package:ev_station_finder/screens/user/roadmap.dart';
@@ -11,7 +6,6 @@ import 'package:ev_station_finder/screens/user/user_view_bookings.dart';
 import 'package:flutter/material.dart';
 import 'package:ev_station_finder/screens/user/user_signin.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:provider/provider.dart';
 
 class DashboardScreen extends StatelessWidget {
   @override
@@ -21,6 +15,7 @@ class DashboardScreen extends StatelessWidget {
         backgroundColor: Colors.green,
         title: Text('DASHBOARD'),
         centerTitle: true,
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: Icon(Icons.exit_to_app),
@@ -70,7 +65,7 @@ class DashboardScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const UserViewBooking(bookings: [],),
+                    builder: (context) => ViewBookingsScreen(),
                   ),
                 );
               },
@@ -82,7 +77,7 @@ class DashboardScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProfileScreen(),
+                    builder: (context) => UserProfile(),
                   ),
                 );
               },

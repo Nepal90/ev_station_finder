@@ -1,99 +1,105 @@
-import 'package:ev_station_finder/components/Button.dart';
-import 'package:ev_station_finder/provider/UserProvider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-//import 'package:ev_station_finder/models/user.dart';
-//import 'package:ev_station_finder/provider/UserProvider.dart';
 
-
-
-
-class ProfileScreen extends StatefulWidget {
+class UserProfile extends StatefulWidget {
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  _UserProfileState createState() => _UserProfileState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _UserProfileState extends State<UserProfile> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<DocumentSnapshot>? _userDetails;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserDetails();
+  }
+
+  void _fetchUserDetails() {
+    final String uid = _auth.currentUser?.uid ?? '';
+    if (uid.isNotEmpty) {
+      _userDetails = _firestore.collection('users').doc(uid).get();
+    } else {
+      _userDetails = Future.value(null);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context).user;
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: const Text('User Profile'),
         backgroundColor: Colors.green,
       ),
-      body: user == null
-          ? const Center(
-              child: Text(
-                'No user logged in',
-                style: TextStyle(fontSize: 18, color: Colors.grey),
-              ),
-            )
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Center(
-                child: Card(
-                  color: const Color.fromARGB(255, 229, 245, 233),
-                  elevation: 4,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Center(
-                          child: CircleAvatar(
-                            radius: 80,
-                           
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'FName:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          user.firstname,
-                          style: const TextStyle(fontSize: 24),
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'LName:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          user.lastname,
-                          style: const TextStyle(fontSize: 24),
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Email:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          user.email,
-                          style: const TextStyle(fontSize: 18, color: Colors.grey),
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Phone Number:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          user.phoneNumber,
-                          style: const TextStyle(fontSize: 18, color: Colors.grey),
-                        ),
-                        const SizedBox(height: 20),
-                        Button(buttonText: "Edit Profile", buttonFunction: () {
+      body: FutureBuilder<DocumentSnapshot>(
+        future: _userDetails,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
 
-                        }, onTap: () {  },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          if (!snapshot.hasData || snapshot.data == null || !snapshot.data!.exists) {
+            return Center(child: Text('No user details found'));
+          }
+
+          final userData = snapshot.data!.data() as Map<String, dynamic>;
+
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildProfileDetail('Name', '${userData['firstName']} ${userData['lastName']}', Icons.person),
+                  _buildDivider(),
+                  _buildProfileDetail('Email', '${userData['email']}', Icons.email),
+                  _buildDivider(),
+                  _buildProfileDetail('Phone', '${userData['mobileNumber']}', Icons.phone),
+                  _buildDivider(),
+                  _buildProfileDetail('Role', '${userData['role']}', Icons.verified_user),
+                ],
               ),
             ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildProfileDetail(String title, String value, IconData icon) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.green),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
+      ),
+      subtitle: Text(
+        value,
+        style: TextStyle(fontSize: 16),
+      ),
+      contentPadding: EdgeInsets.all(16),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Divider(
+      color: Colors.grey[300],
+      height: 1,
     );
   }
 }

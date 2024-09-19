@@ -15,6 +15,7 @@ class AdminDashboard extends StatelessWidget {
         backgroundColor: Colors.green,
         title: Text('DASHBOARD'),
         centerTitle: true,
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: Icon(Icons.exit_to_app),
@@ -63,7 +64,7 @@ class AdminDashboard extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AdminViewBooking(bookings: [],),
+                    builder: (context) => ViewBookingsScreen(),
                   ),
                 );
               },
@@ -75,7 +76,7 @@ class AdminDashboard extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AdminProfile(),
+                    builder: (context) => AdminProfilePage(),
                   ),
                 );
               },

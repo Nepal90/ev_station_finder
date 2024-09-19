@@ -1,7 +1,7 @@
 import 'package:ev_station_finder/components/Button.dart';
 import 'package:ev_station_finder/components/DefField.dart';
+import 'package:ev_station_finder/services/slots_firestore_service.dart';
 import 'package:flutter/material.dart';
-
 
 class AddSlot extends StatefulWidget {
   const AddSlot({super.key});
@@ -12,22 +12,26 @@ class AddSlot extends StatefulWidget {
 
 class _AddSlotState extends State<AddSlot> {
   final _formKey = GlobalKey<FormState>();
+  final _firestoreService = SlotFirestoreService();
 
   final _voltageController = TextEditingController();
   final _priceController = TextEditingController();
 
-  // String? _stationName;
-  // String? _locationName;
-  // String? _cityName;
-
   bool _isStationEnabled = true;
+
+  @override
+  void dispose() {
+    _voltageController.dispose();
+    _priceController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
-        title: const Text('Add Stations'),
+        title: const Text('Add Slot'),
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
@@ -55,7 +59,7 @@ class _AddSlotState extends State<AddSlot> {
                 hint: "Enter voltage price",
                 obsecure: false,
                 lable: "Price",
-                inputtype: TextInputType.name,
+                inputtype: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter Price';
@@ -64,12 +68,11 @@ class _AddSlotState extends State<AddSlot> {
                 },
               ),
               const SizedBox(height: 20.0),
-
               Padding(
-                padding: const EdgeInsets.fromLTRB(10,8,8,8),
+                padding: const EdgeInsets.fromLTRB(10, 8, 8, 8),
                 child: Row(
                   children: [
-                    Text('Slot Enabled:'),
+                    const Text('Slot Enabled:'),
                     Switch(
                       value: _isStationEnabled,
                       onChanged: (value) {
@@ -85,16 +88,22 @@ class _AddSlotState extends State<AddSlot> {
               Center(
                 child: Button(
                   buttonText: "Add Slot",
-                  buttonFunction: () {
+                  buttonFunction: () async {
                     if (_formKey.currentState!.validate()) {
+                      await _firestoreService.addSlot(
+                        _voltageController.text,
+                        _priceController.text,
+                        _isStationEnabled,
+                      );
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Slot added successfully'),
                         ),
                       );
-                      // Add station logic here, including the _isStationEnabled state
+                      Navigator.of(context).pop(); 
                     }
-                  }, onTap: () {  },
+                  },
+                  onTap: () {},
                 ),
               ),
             ],

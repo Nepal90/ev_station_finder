@@ -1,10 +1,8 @@
 import 'package:ev_station_finder/screens/admin/admin_dashboard.dart';
-import 'package:ev_station_finder/screens/user/user_dashboard.dart';
 import 'package:ev_station_finder/screens/user/user_signup.dart';
 import 'package:ev_station_finder/components/Button.dart';
 import 'package:ev_station_finder/components/DefField.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class login extends StatefulWidget {
   const login({super.key});
@@ -19,20 +17,7 @@ class _loginState extends State<login> {
   bool _showPassword = true;
   
 
-  // Future<void> _signIn() {}
-  // async {}
-  //   try {
-  //     await FirebaseAuth.instance.signInWithEmailAndPassword(
-  //       email: _emailController.text,
-  //       password: _passwordController.text,
-  //     );
-  //   } on FirebaseAuthException catch (e) {
-  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //       content: Text(e.message ?? 'Unknown error'),
-  //     ));
-  //   }
-  // }
-//---------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
     return Scaffold(

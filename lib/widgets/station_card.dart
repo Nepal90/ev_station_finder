@@ -11,9 +11,14 @@ class StationCard extends StatelessWidget {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: ListTile(
-        leading: Image.network(station.imageUrl, fit: BoxFit.cover, width: 100),
-        title: Text(station.name),
-        subtitle: Text('${station.address}\nCity: ${station.city}\nStatus: ${station.status}'),
+        title: Text(
+          station.name,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          '${station.location}\nCity: ${station.city}\nStatus: ${station.isEnabled ? 'Enabled' : 'Disabled'}',
+          style: TextStyle(color: Colors.black54),
+        ),
         isThreeLine: true,
         trailing: station.nearby ? Icon(Icons.location_on, color: Colors.red) : null,
       ),

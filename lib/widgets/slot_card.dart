@@ -22,7 +22,7 @@ class SlotCard extends StatelessWidget {
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
-            Text(station.address),
+            Text(station.location),
           ],
         ),
       ),

@@ -22,8 +22,19 @@ class FirestoreServices {
         'location': doc['location'],
         'city': doc['city'],
         'isEnabled': doc['isEnabled'],
+        // 'nearby': doc['nearby'] ?? false
       }).toList(),
     );
+  }
+
+  // Update station
+  Future<void> updateStation(String id, String name, String location, String city, bool isEnabled) async {
+    await _db.collection('stations').doc(id).update({
+      'name': name,
+      'location': location,
+      'city': city,
+      'isEnabled': isEnabled,
+    });
   }
 
   // Delete station
